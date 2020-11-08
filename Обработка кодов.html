@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Process cises</title>
+    <style>
+
+        #main
+        {
+            margin-left: 25%;
+        }
+
+        .pushDiv
+        {
+            padding: 5px 20px;
+            margin: 10px 0;
+            background: burlywood;
+            color: 666;
+            border-radius: 6px;
+        }
+        
+        .pushDivArea 
+        {
+            position: fixed;
+            right: 20px;
+            top: 0;
+            /* background: rgba(0, 0, 0, .01); */
+            bottom: 80%;
+            width: 10%;
+            z-index: 9999;
+
+
+        }
+
+
+    </style>
+</head>
+<body>
+    <div id ="left"></div>
+    <div id="main">
+
+        <h3>Process cises</h3>
+        <textarea name="source" id="source" cols="30" rows="10"></textarea>
+
+        <textarea name="result" id="result" cols="100" rows="10"></textarea>
+        <div>
+            <p>Количество кодов в 1 массиве</p>
+            <input type="text" value="10" id="numberInCunk">
+        </div>
+       
+        <div>
+            <button id = "buttonForQuotes">Обернуть в ковычки, экранировать спец. символы JSON</button>
+        </div>
+        <div>
+            <button id = "buttonForLinesXML"> Перобразовать в строку, экранировать спец. символы XML</button>
+        </div>
+        <div>
+            <button id = "buttonForLines">Преобразовать в строку, без экранирования</button>
+        </div>
+        <div>
+            <button id = "buttonForDeleteXML">Удалить экранирование XML</button>
+        </div>
+        <div>
+            <button id = "buttonForDeletJSON">Удалить экранирование JSON</button>
+        </div>
+
+        <div id ="resultArea">
+            
+        </div>
+    </div>
+    <div id="right"></div>
+    
+</body>
+<script>
+    window.onload = function() 
+    {
+
+        var buttonForQuotes = document.getElementById("buttonForQuotes");
+        var buttonForLines = document.getElementById("buttonForLines");
+        var buttonForDeleteXML = document.getElementById("buttonForDeleteXML");
+        var buttonForDeletJSON = document.getElementById("buttonForDeletJSON");
+        
+
+
+        buttonForQuotes.onclick = function(){
+            var btriger = "Quotes";
+            generalScriptForButtons(btriger);
+
+        }
+
+        buttonForLines.onclick = function(){
+            var btriger = "Lines";
+			generalScriptForButtons(btriger);
+
+        }
+
+        buttonForDeleteXML.onclick = function(){
+            var btriger = "DeleteXML";
+			generalScriptForButtons(btriger);
+
+        }
+
+        buttonForLinesXML.onclick = function(){
+            var btriger = "LinesXML";
+			generalScriptForButtons(btriger);
+
+        }
+
+        buttonForDeletJSON.onclick = function(){
+            var btriger = "DeletJSON";
+			generalScriptForButtons(btriger);
+
+        }
+
+        function generalScriptForButtons(buttonsTriger)
+        {
+            var numberInCunk = document.getElementById("numberInCunk").value;
+            var gtriger = buttonsTriger;
+			var sourceText = document.getElementById("source").value;
+			var resultText = document.getElementById("result");
+            var resultDiv = document.getElementById("resultArea");
+            //resultText.cols = 200;
+			var preparedString = PrepareString(sourceText);
+            var preparedArr = prepareArr(preparedString, gtriger);
+            var preparedCises = prepareResultValue(preparedArr, numberInCunk, gtriger)
+            window.navigator.clipboard.writeText(preparedCises);
+            SetElementsValue (resultText, preparedCises);
+            SplitToChild(resultDiv, preparedArr, numberInCunk, gtriger);
+            pushRepot(); 
+        }
+
+
+        function PrepareString(source_text) 
+        {
+            var resultString = "";
+            var processingString = source_text.split("\n");
+            processingString.forEach(element =>
+            {
+                
+                   if (element.length > 5) 
+                   { 
+                        switch (element.length) 
+                        {
+                            case 29:
+                                resultString = resultString + element.substring(0,21) + "\n";
+                                break;
+                            case 43:
+                                resultString = resultString + element.substring(0,25) + "\n";
+                                break;
+                            case 32:
+                                resultString = resultString + element.substring(0,25) + "\n";
+                                break;
+							case 0:
+                                break;    
+                            default:
+                                resultString = resultString + element + "\n";
+                                break;
+                        }
+                   }
+            });
+            return resultString;
+        }   
+        
+        
+        function prepareArr(source_text, triger)
+        {
+            var localTriget = triger;
+            var chunk = numberInCunk;
+            resultArr = []
+			processingString = source_text.split("\n")
+            processingString.forEach(element => 
+                {
+                    if (element.length > 5) 
+                    {
+                        
+                        if (localTriget == "Quotes") 
+                        {
+                            element = element.replace('"','\\"');
+                            resultArr.push(element);
+                        }
+                        else if(localTriget == "LinesXML")
+                        {
+                            element = element.replace('&','&amp;');
+                            element = element.replace('"','&quot;');
+                            element = element.replace("''",'&apos;');
+                            element = element.replace('<','&lt;');
+                            element = element.replace('>','&gt;');
+                            resultArr.push(element);
+                        } 
+                        else if(localTriget == "DeleteXML")
+                        {
+                            element = element.replace('&amp;', '&' );
+                            element = element.replace('&quot;','"');
+                            element = element.replace('&apos;', "''");
+                            element = element.replace('&lt;', '<');
+                            element = element.replace('&gt;', '>');
+                            resultArr.push(element);
+                        }
+                        else if(localTriget == "DeletJSON")
+                        {
+                            element = element.replace('\\\\"', '"' );
+                            resultArr.push(element);
+                        }
+
+                        else
+                        {						
+                            resultArr.push(element);
+                        }
+                    }   
+                }); 
+            return resultArr;
+        }
+        
+
+        function prepareResultValue(arr, number, triget)
+        {
+            var resultString = "";
+            var rChunk = number;
+            var localArr = arr;
+            var localTriget = triget;
+            var rCounter = 0;
+            localArr.forEach(element => 
+                {
+                    if (element.length > 5) 
+                    {
+                        
+                        if (localTriget == "Quotes") 
+                        {
+                            element = element.replace('"','\\"');
+                            rCounter = rCounter + 1;
+                            if (rCounter >= processingString.length || rCounter%rChunk == 0)
+                            { 
+                                resultString = resultString + '"' + element + '"' + "\n" + "\n" + "\n";
+                            }
+                            else
+                            {
+                                resultString = resultString + '"' + element + '",' + "\n";
+                            }
+
+                        }
+                        else if(localTriget == "LinesXML")
+                        {
+                            rCounter = rCounter + 1;                          
+                            if (rCounter >= processingString.length || rCounter%rChunk == 0)
+                            { 
+                                resultString = resultString + " " + element + "\n" + "\n";
+                            }
+							else
+							{
+							resultString = resultString + " " + element;
+							}
+                        }
+                            
+                        else
+                        {						
+                            rCounter = rCounter + 1;
+							if (rCounter >= processingString.length || rCounter%rChunk == 0)
+                            { 
+                                resultString = resultString + " " + element + "\n" + "\n";
+                            }
+							else
+							{
+							resultString = resultString + " " + element;
+							}
+                        }
+                    }   
+                }); 
+            return resultString;
+        }
+
+
+        function SetElementsValue (HTMLelement,resultString )
+        {
+            HTMLelement.value = resultString;
+
+        }
+
+        function SplitToChild(HTMLelement, arr, Number, triger) 
+        {
+            var locNumber = Number;
+            var ResultArr = arr;
+            var rTriger = triger;
+            HTMLelement.innerHTML = ''
+            
+            for (let index = 0; index < ResultArr.length; index) 
+            {
+                var resultTextArea = document.createElement("textarea");
+                var rElement = "";
+                for (let i = 0; i < locNumber; i++) 
+                {
+                    if (index < ResultArr.length) 
+                    {
+                                           
+                        switch (rTriger) 
+                        {
+                            case "Quotes":
+                                if ( i+1 == locNumber)
+                                    { 
+                                        rElement = rElement + '"' +  ResultArr[index] + '"';
+                                        index = index +1;
+                                    }
+                                else
+                                    {
+                                        rElement = rElement + '"' + ResultArr[index] + '",' + "\n";
+                                        index = index +1;
+                                    }   
+                                break;
+                            case "LinesXML":
+                                if (i+1 == locNumber)
+                                    { 
+                                        rElement = rElement +  " " + ResultArr[index] + "\n" + "\n";
+                                        index = index + 1;    
+                                    }
+                                else
+                                    {
+                                        rElement = rElement + " " + ResultArr[index];
+                                        index = index + 1; 
+                                    }                          
+                                break;    
+                            case "Lines":
+                                if (i+1 == locNumber)
+                                    { 
+                                        rElement = rElement +  " " + ResultArr[index] + "\n" + "\n";
+                                        index = index + 1;    
+                                    }
+                                else
+                                    {
+                                        rElement = rElement + " " + ResultArr[index];
+                                        index = index + 1; 
+                                    } 
+                                break;
+                            default:
+                                rElement = rElement + " " + ResultArr[index];    
+                                index = index + 1;    
+                                break;
+                        }
+                    }
+                }
+                switch (rTriger) {
+                    case "Quotes":
+                        resultTextArea.cols = ResultArr[0].length +5;
+                        resultTextArea.rows = locNumber;
+                        resultTextArea.value =  rElement;
+                        break;
+                    case "LinesXML":
+                        resultTextArea.cols = (ResultArr[0].length +5)*locNumber;
+                        resultTextArea.value =  rElement;
+                        break;
+                    case  "Lines":
+                        resultTextArea.cols = (ResultArr[0].length +5)*locNumber;
+                        resultTextArea.value =  rElement;
+                        break;    
+                    default:
+                        resultTextArea.cols = (ResultArr[0].length +5)*locNumber;
+                        resultTextArea.value =  rElement;
+                        break;
+
+                }
+                HTMLelement.appendChild(resultTextArea);   
+            }
+        }
+
+        function pushRepot() 
+        {
+            var pushDiv = document.createElement("div");
+            pushDiv.classList.add("pushDiv");
+            pushDiv.innerText = "The Processed CISes added to the clickboard";
+            document.body.appendChild(pushDiv);
+            var pushDivArea = document.createElement("div");
+            pushDivArea.classList.add("pushDivArea");
+            document.body.appendChild(pushDivArea);
+            pushDivArea.appendChild(pushDiv);
+            setTimeout(
+                ()=> {
+                    pushDivArea.remove(); 
+                }, 
+                3500);
+        }
+
+
+    }
+
+</script>
+
+</html>

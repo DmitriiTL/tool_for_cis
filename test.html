@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div>
+        <input type="file" name="smt" id="myFile">
+    </div>
+    <div>
+        <input type="file" multiple id="myFiles">
+    </div>   
+    <button id = "getFiles">ntcn</button>
+    
+</body>
+<script>
+    window.onload = () =>
+    {
+        var getFiles = document.getElementById("getFiles");
+        var input = document.getElementById("myFiles");
+        getFiles.onclick = () =>
+
+        {
+            console.log(input.files);
+            var file = input.files[0];
+            var reader = new FileReader();
+            reader.onload = () =>
+            {
+                console.log(reader.result);
+            }
+            reader.readAsText(file);
+            
+
+
+        }
+
+
+
+    }
+</script>
+</html>
